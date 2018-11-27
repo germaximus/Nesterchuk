@@ -14,7 +14,7 @@ Mouse genomic sequences and annotation files (GRCm38.p4) were downloaded from th
 | files               | MD5 check sum (unzipped)         | Description                                               |
 | ------------------- |:--------------------------------:| ----------------------------------------------------------|
 | GRCm38.p4.rna.fa    | b22037bd202465ce84cee9f6409331e8 | RNA in fasta format, coding + noncoding                   |
-| GRCm38.p4.genome.fa | d74346dac686cc024c087f6f2a2fc3cf | Genome sequence (nuclear genome only)                     |
+| GRCm38.p4.genome.fa | 49e0e5a638620d90990be88c81030923 | Genome sequence (nuclear genome only)                     |
 | GRCm38.p4.gbk       | adc1125bf6b2c3b5a52414fe2fe98ac7 | RNA in gene bank format, coding + noncoding               |
 | GRCm38.p4.gff3      | ab982471b0b29ebde3d966ec2424253f | Genome annotation                                         | 
 
@@ -33,7 +33,7 @@ Parse GRCm38.p4.gbk end extract the longest transcript for each gene.
 ```bash
 mRNA_extractor.pl GRCm38.p4.gbk	#generates temp3 file as output
 ```
-Fill up their UTRs to 100 nt based on the genomic coordinates (if they are shorter). Takes temp3 file from previous step as input. Make sure GRCh38.p12.fna genome reference is present in the same folder.
+Fill up their UTRs to 100 nt based on the genomic coordinates (if they are shorter). Takes temp3 file from previous step as input. Make sure GRCm38.p4.fa genome reference is present in the same folder.
 ```bash
 mRNA_genome_filler.pl	#generates mRNA_100.fasta containing 20575 transcripts
 ```
@@ -41,5 +41,32 @@ To generate a non-redundant subset of transcripts, run blast all vs all, then pr
 ```bash
 makeblastdb -in mRNA_100.fasta -dbtype nucl #building an index
 blastn -outfmt 6 -evalue 0.001 -db mRNA_100.fasta -query mRNA_100.fasta -out blast_result.txt
-BLASTNprocessor.pl blast_result.txt	#generates mRNA_100uniq.fasta containing 17729 transcripts
+BLASTNprocessor.pl blast_result.txt	#generates mRNA_100uniq.fasta containing 17738 transcripts
+```
+**Building necessary index files**  
+```bash
+bowtie2-build GRCm38.p4.genome.fa ./Mouse_indices/NCBI_genome #indexing mouse genome for bowtie2 and Tophat
+bowtie-build Mouse_rmtRNA.fa ./Mouse_indices/Mouse_rmtRNA
+bowtie-build mRNA_100uniq.fa ./Mouse_indices/mRNA_100uniq
+tophat -G GRCm38.p4.Refseq.coding.gff --transcriptome-index ./tophat-2.1.1/Mouse_indices/Refseq_coding ./bowtie2-2.2.7/Mouse_indices/NCBI_genome #Indexing mouse transcriptome for TopHat
+```
+ ### Illumina sequencing reads mapping
+ **mRNA-seq** 
+```bash
+cutadapt -j 10 --overlap 5 -m 30 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o trimmed.fastq input.fastq #adapter trimming
+bowtie -p 36 --un filtered.fastq bowtie-1.2.1.1/Mouse_indices/Mouse_rmtRNA trimmed.fastq >/dev/null #filtering out ribosomal, mitochondrial, tRNA and PhiX reads
+#mapping for gene expression estimate
+tophat -p 50 --library-type fr-firststrand --transcriptome-index ../tophat-2.1.1/Human_indices/Refseq_coding --no-novel-juncs -o ./mRNA/ ../bowtie2-2.2.7/Human_indices/NCBI_genome filtered.fastq #mapping to a transcriptome and a genome
+featureCounts -g gene -s 2 accepted_hits.bam -a ./tophat-2.1.1/Human_indices/Refseq_coding.gff -o feature.counts #counting gene expression
+#mapping for coverage depth plots
+bowtie -p 36 -v 2 -m 1 –-nofw --max redundant.fastq /bowtie-1.2.2/mRNA_100uniq filtered.fastq >uniq.bwt
+```
+**Ribo-seq**  
+```bash
+cutadapt -j 10 -u 1 -m 23 -a AGATCGGAAGAGCACACGTCT --discard-untrimmed -o trimmed.fastq input.fastq
+bowtie -p 36 --un filtered.fastq ./bowtie-1.2.1.1/Mouse_indexes/Mouse_rmtRNA trimmed.fastq >/dev/null
+#mapping for gene expression estimate
+tophat --library-type fr-secondstrand --transcriptome-index ./tophat-2.1.1/Mouse_indices/Refseq_coding --no-novel-juncs -o ./output_folder ./bowtie2-2.2.7/Mouse_indices/NCBI_genome filtered.fastq
+featureCounts -g gene -s 1 accepted_hits.bam -a ./tophat-2.1.1/Mouse_indices/Refseq_coding.gff -o feature.counts
+#mapping for coverage depth plots
 ```
