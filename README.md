@@ -51,22 +51,35 @@ bowtie-build mRNA_100uniq.fa ./Mouse_indices/mRNA_100uniq
 tophat -G GRCm38.p4.Refseq.coding.gff --transcriptome-index ./tophat-2.1.1/Mouse_indices/Refseq_coding ./bowtie2-2.2.7/Mouse_indices/NCBI_genome #Indexing mouse transcriptome for TopHat
 ```
  ### Illumina sequencing reads mapping
- **mRNA-seq** 
+ **Liver Transcriptome analysis (mRNA-seq)** 
 ```bash
 cutadapt -j 10 --overlap 5 -m 30 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o trimmed.fastq input.fastq #adapter trimming
 bowtie -p 36 --un filtered.fastq bowtie-1.2.1.1/Mouse_indices/Mouse_rmtRNA trimmed.fastq >/dev/null #filtering out ribosomal, mitochondrial, tRNA and PhiX reads
 #mapping for gene expression estimate
-tophat -p 50 --library-type fr-firststrand --transcriptome-index ../tophat-2.1.1/Human_indices/Refseq_coding --no-novel-juncs -o ./mRNA/ ../bowtie2-2.2.7/Human_indices/NCBI_genome filtered.fastq #mapping to a transcriptome and a genome
-featureCounts -g gene -s 2 accepted_hits.bam -a ./tophat-2.1.1/Human_indices/Refseq_coding.gff -o feature.counts #counting gene expression
+tophat -p 50 --library-type fr-firststrand --transcriptome-index ../tophat-2.1.1/Mouse_indices/Refseq_coding --no-novel-juncs -o ./mRNA/ ../bowtie2-2.2.7/Mouse_indices/NCBI_genome filtered.fastq #mapping to a transcriptome and a genome
+featureCounts -g gene -s 2 accepted_hits.bam -a ./tophat-2.1.1/Mouse_indices/Refseq_coding.gff -o feature.counts #counting gene expression
 #mapping for coverage depth plots
-bowtie -p 36 -v 2 -m 1 –-nofw --max redundant.fastq /bowtie-1.2.2/mRNA_100uniq filtered.fastq >uniq.bwt
+bowtie -p 36 -v 2 -m 1 –-nofw --max redundant.fastq ../bowtie-1.2.1.1/Mouse_indices/mRNA_100uniq filtered.fastq >uniq.bwt
 ```
-**Ribo-seq**  
+**Liver Ribo-seq**  
 ```bash
 cutadapt -j 10 -u 1 -m 23 -a AGATCGGAAGAGCACACGTCT --discard-untrimmed -o trimmed.fastq input.fastq
-bowtie -p 36 --un filtered.fastq ./bowtie-1.2.1.1/Mouse_indexes/Mouse_rmtRNA trimmed.fastq >/dev/null
+bowtie -p 36 --un filtered.fastq ./bowtie-1.2.1.1/Mouse_indices/Mouse_rmtRNA trimmed.fastq >/dev/null
 #mapping for gene expression estimate
-tophat --library-type fr-secondstrand --transcriptome-index ./tophat-2.1.1/Mouse_indices/Refseq_coding --no-novel-juncs -o ./output_folder ./bowtie2-2.2.7/Mouse_indices/NCBI_genome filtered.fastq
+tophat -p 50 --library-type fr-secondstrand --transcriptome-index ./tophat-2.1.1/Mouse_indices/Refseq_coding --no-novel-juncs -o ./output_folder ./bowtie2-2.2.7/Mouse_indices/NCBI_genome filtered.fastq
 featureCounts -g gene -s 1 accepted_hits.bam -a ./tophat-2.1.1/Mouse_indices/Refseq_coding.gff -o feature.counts
 #mapping for coverage depth plots
+bowtie -p 36 -v 2 -m 1 –-norc --max redundant.fastq ../bowtie-1.2.1.1/Mouse_indices/mRNA_100uniq filtered.fastq >uniq.bwt
 ```
+### Metagene Coverage Profiles
+Although this information can be obtained from Ribo-seq and mRNA-seq genomic alignment files, it is much easier to re-align raw reads to the *mRNA-100uniq.fasta* file prepared earlier because aligned reads will have transcript coordinates (discontinious) instead of genomic (broken down into exons).
+```bash
+Coverage.pl uniq.bwt #make sure mRNA_100uniq.fasta is in the same folder with the script or add full path inside the sript. Input file should be in native bowtie-1 format
+Coverge.R #process coverage files, plot and explore
+```
+<details><summary><b>Ribosome occupancy plot </b></summary>
+ 
+Green, red, and blue tracks are patient and two healthy controls corespondingly. Grey track is the mRNA coverage from one of healthy controls. Transcripts are aligned by start codon (left panel) or stop codon (right panel). 100 nt unto UTR are added on both sides.
+ 
+
+</details>
