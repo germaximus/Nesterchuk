@@ -74,7 +74,7 @@ bowtie -p 36 -v 2 -m 1 –-norc --max redundant.fastq ../bowtie-1.2.1.1/Mouse_in
 ### Metagene Coverage Profiles
 Although this information can be obtained from Ribo-seq and mRNA-seq genomic alignment files, it is much easier to re-align raw reads to the *mRNA-100uniq.fasta* file prepared earlier because aligned reads will have transcript coordinates (discontinious) instead of genomic (broken down into exons).
 ```bash
-Coverage.pl uniq.bwt #make sure mRNA_100uniq.fasta is in the same folder with the script or add full path inside the sript. Input file should be in native bowtie-1 format
+Coverage.pl uniq.bwt #make sure mRNA_100uniq.fasta is in the same folder with the script or add full path inside the sript. Input file should be in native bowtie-1 format. mRNA_100uniq.fasta should be converted to unix format if run on the linux server.
 Coverge.R #process coverage files, plot and explore
 ```
 <details><summary><b>Ribosome occupancy plot </b></summary>
