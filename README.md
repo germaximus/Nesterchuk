@@ -19,7 +19,7 @@ Mouse genomic sequences and annotation files (GRCm38.p4) were downloaded from th
 | GRCm38.p4.gff3      | ab982471b0b29ebde3d966ec2424253f | Genome annotation                                         | 
 
 **Customizing genome annotation**  
-Extrachromosomal contigs and annotations were omitted. 'Gnomon' (Predicted) records from gff file were also omitted and only 'RefSeq' (manually curated) left. Perl and R scripts are included in the GitHub repository.   
+Extrachromosomal contigs and annotations were omitted. 'Gnomon' (Predicted) records from gff file were also omitted and only 'RefSeq' (manually curated) left. All mice in this project are females, therefore, Y chromosome was discarder as well. Perl and R scripts are included in the GitHub repository.   
 ```bash
 Discard_extrachromosomal_annotation.pl GRCm38.p4.gff3 >GRCm38.p4.custom.gff
 Discard_gnomon_annotation.pl >GRCm38.p4.Refseq.gff	# automatically takes GRCm38.p4.custom.gff as an input
