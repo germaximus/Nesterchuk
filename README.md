@@ -9,7 +9,7 @@ blast 2.7.1+
 Raw data, index files, and custom annotation can be found in the GEO [NCBI repository]()
 
 ### Preparing genome annotation and index files
-Mouse genomic sequences and annotation files (GRCm38.p4) were downloaded from the [NCBI repository](ftp://ftp.ncbi.nih.gov/genomes/M_musculus/). To obtain genome assembly, download fasta files of individual chromosomes and concatenate them in the ascending order (omit mitochondrial chromosome). Since all animals were females, Y chromosome should also be discarded.
+Mouse genomic sequences and annotation files (GRCm38.p4) were downloaded from the [NCBI repository](ftp://ftp.ncbi.nih.gov/genomes/M_musculus/). To obtain genome assembly, download fasta files of individual chromosomes and concatenate them in the ascending order (omit mitochondrial chromosome).
 
 | files               | MD5 check sum (unzipped)         | Description                                               |
 | ------------------- |:--------------------------------:| ----------------------------------------------------------|
@@ -19,7 +19,7 @@ Mouse genomic sequences and annotation files (GRCm38.p4) were downloaded from th
 | GRCm38.p4.gff3      | ab982471b0b29ebde3d966ec2424253f | Genome annotation                                         | 
 
 **Customizing genome annotation**  
-Extrachromosomal contigs and annotations were omitted. 'Gnomon' (Predicted) records from gff file were also omitted and only 'RefSeq' (manually curated) left. All mice in this project are females, therefore, Y chromosome was discarder as well. Perl and R scripts are included in the GitHub repository.   
+Extrachromosomal contigs and annotations were omitted. 'Gnomon' (Predicted) records from gff file were also omitted and only 'RefSeq' (manually curated) left. All mice in this project are females, therefore, Y chromosome was discarded as well. Perl and R scripts are included in the GitHub repository.   
 ```bash
 Discard_extrachromosomal_annotation.pl GRCm38.p4.gff3 >GRCm38.p4.custom.gff
 Discard_gnomon_annotation.pl >GRCm38.p4.Refseq.gff	# automatically takes GRCm38.p4.custom.gff as an input
