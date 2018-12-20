@@ -51,7 +51,7 @@ bowtie-build mRNA_100uniq.fa ./Mouse_indices/mRNA_100uniq
 tophat -G GRCm38.p4.Refseq.coding.gff --transcriptome-index ./tophat-2.1.1/Mouse_indices/Refseq_coding ./bowtie2-2.2.7/Mouse_indices/NCBI_genome #Indexing mouse transcriptome for TopHat
 ```
  ### Illumina sequencing reads mapping
- **Liver Transcriptome analysis (mRNA-seq)** 
+ **Liver and AML12 cell line transcriptome analysis (mRNA-seq)** 
 ```bash
 cutadapt -j 10 --overlap 5 -m 30 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o trimmed.fastq input.fastq #adapter trimming
 bowtie -p 36 --un filtered.fastq bowtie-1.2.1.1/Mouse_indices/Mouse_rmtRNA trimmed.fastq >/dev/null #filtering out ribosomal, mitochondrial, tRNA and PhiX reads
