@@ -1,4 +1,5 @@
 # Nesterchuk_2018
+Data analysis for the [Translation elongation factor 2 depletion by siRNA in mouse liver leads to mTOR-independent translational upregulation of ribosomal protein genes](https://doi-org.ezp-prod1.hul.harvard.edu/10.1038/s41598-020-72399-4) article.  
 
 **Prerequisites:**  
 Cutadapt 1.19  
